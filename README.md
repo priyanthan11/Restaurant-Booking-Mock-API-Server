@@ -31,7 +31,7 @@ GFDE test/
 pip install -r requirements.txt
 ```
 
-2. (Optional) Initialize database manually:
+2. (Optional) Initialise database manually:
 ```bash
 python app/init_db.py
 ```
@@ -39,12 +39,12 @@ python app/init_db.py
 
 ## Running the Server
 
-### Development (Recommended)
+### Development Mode (Recommended)
 ```bash
 python -m app
 ```
 
-### Alternative Development
+### Alternative Development Mode
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8547
 ```
@@ -71,8 +71,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6I
 ```
 
 **Authentication Errors:**
-- **401 Unauthorized**: Missing, invalid, or expired token
-- **401 Unauthorized**: Invalid authorization header format
+- **401 Unauthorised**: Missing, invalid, or expired token
+- **401 Unauthorised**: Invalid authorisation header format
 
 ## API Endpoints
 
