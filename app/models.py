@@ -11,6 +11,7 @@ Author: AI Assistant
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+
 from sqlalchemy import (
     Column, Integer, String, DateTime, Boolean, Date, Time, Text, ForeignKey
 )
@@ -48,7 +49,8 @@ class Restaurant(Base):
 
     # Relationships
     bookings = relationship("Booking", back_populates="restaurant")
-    availability_slots = relationship("AvailabilitySlot", back_populates="restaurant")
+    availability_slots = relationship(
+        "AvailabilitySlot", back_populates="restaurant")
 
 
 class Customer(Base):
@@ -119,7 +121,8 @@ class Booking(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     booking_reference = Column(String, unique=True, index=True, nullable=False)
-    restaurant_id = Column(Integer, ForeignKey("restaurants.id"), nullable=False)
+    restaurant_id = Column(Integer, ForeignKey(
+        "restaurants.id"), nullable=False)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
     visit_date = Column(Date, nullable=False)
     visit_time = Column(Time, nullable=False)
@@ -128,10 +131,12 @@ class Booking(Base):
     special_requests = Column(Text)
     is_leave_time_confirmed = Column(Boolean, default=False)
     room_number = Column(String)
-    status = Column(String, default="confirmed")  # confirmed, cancelled, completed
+    # confirmed, cancelled, completed
+    status = Column(String, default="confirmed")
     cancellation_reason_id = Column(Integer)
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+                        onupdate=datetime.utcnow)
 
     # Relationships
     restaurant = relationship("Restaurant", back_populates="bookings")
@@ -158,7 +163,8 @@ class AvailabilitySlot(Base):
     __tablename__ = "availability_slots"
 
     id = Column(Integer, primary_key=True, index=True)
-    restaurant_id = Column(Integer, ForeignKey("restaurants.id"), nullable=False)
+    restaurant_id = Column(Integer, ForeignKey(
+        "restaurants.id"), nullable=False)
     date = Column(Date, nullable=False)
     time = Column(Time, nullable=False)
     max_party_size = Column(Integer, default=8)
@@ -166,7 +172,8 @@ class AvailabilitySlot(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships
-    restaurant = relationship("Restaurant", back_populates="availability_slots")
+    restaurant = relationship(
+        "Restaurant", back_populates="availability_slots")
 
 
 class CancellationReason(Base):

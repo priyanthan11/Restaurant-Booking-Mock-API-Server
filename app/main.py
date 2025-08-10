@@ -10,6 +10,7 @@ Version: 1.0.0
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.routers import availability, booking
 from app.database import engine
 from app.models import Base
@@ -29,9 +30,23 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+# Allow frontend's orgin
+origins = [
+    "http://localhost:3000",  # React dev server
+    "http://127.0.0.1:3000"
+]
+
 # Include API routers
 app.include_router(availability.router)
 app.include_router(booking.router)
+# Enable CORS for frontend access
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
 @app.on_event("startup")
