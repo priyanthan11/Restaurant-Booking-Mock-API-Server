@@ -11,10 +11,11 @@ import {
   LocalizationProvider,
   DatePicker,
   TimePicker,
+  validateTime,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-
+import { grid, paper } from "@mui/material";
 const API_BASE = "http://localhost:8547/api/ConsumerApi/v1/Restaurant";
 const TOKEN =
   "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImFwcGVsbGErYXBpQHJlc2RpYXJ5LmNvbSIsIm5iZiI6MTc1NDQzMDgwNSwiZXhwIjoxNzU0NTE3MjA1LCJpYXQiOjE3NTQ0MzA4MDUsImlzcyI6IlNlbGYiLCJhdWQiOiJodHRwczovL2FwaS5yZXNkaWFyeS5jb20ifQ.g3yLsufdk8Fn2094SB3J3XW-KdBc0DY9a2Jiu_56ud8";
@@ -136,6 +137,105 @@ export default function BookingManager() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [validationErrors, setValidationErrors] = useState({
+    customerName: "",
+    customerEmail: "",
+    visitDate: "",
+    visitTime: "",
+    partySize: "",
+  });
+
+  // Validation functions
+  function validateName(name) {
+    if (!name.trim()) return "Name is required.";
+    return "";
+  }
+  function validateEmail(email) {
+    // Simple email regex for demonstration
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) return "Email is required.";
+    if (!emailRegex.test(email)) return "Invalid email format.";
+    return "";
+  }
+
+  function validateVisitDate(date) {
+    if (!date) return "Visit date is required";
+    return "";
+  }
+  function validateVisitTime(time) {
+    if (!time) return "Visit time is required.";
+    return "";
+  }
+
+  function validatePartySize(size) {
+    if (!size || size < 1 || size > 20)
+      return "party size must be between 1 and 20.";
+    return "";
+  }
+
+  const BookingForm = ({ onSubmit }) => {
+    const [FormData, setFormData] = useState({
+      name: "",
+      email: "",
+      phone: "",
+      date: "",
+      time: "",
+      guests: 1,
+      notes: "",
+    });
+  };
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [name]: value }));
+  // };
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   onSubmit(FormData);
+  // };
+  // // Change handlers with validation updates
+  const handleCustomerNameChange = (e) => {
+    const value = e.target.value;
+    setCustomerName(value);
+    setValidationErrors((prev) => ({
+      ...prev,
+      customerName: validateName(value),
+    }));
+  };
+
+  const handleCustomerEmailChange = (e) => {
+    const value = e.target.value;
+    setCustomerEmail(value);
+    setValidationErrors((prev) => ({
+      ...prev,
+      customerEmail: validateEmail(value),
+    }));
+  };
+
+  const handleVisitDateChange = (newValue) => {
+    setVisitDate(newValue);
+    setValidationErrors((prev) => ({
+      ...prev,
+      visitDate: validateVisitDate(newValue),
+    }));
+  };
+
+  const handleVisitTimeChange = (newValue) => {
+    setVisitTime(newValue);
+    setValidationErrors((prev) => ({
+      ...prev,
+      visitTime: validateVisitTime(newValue),
+    }));
+  };
+
+  const handlePartySizeChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setPartySize(value);
+    setValidationErrors((prev) => ({
+      ...prev,
+      partySize: validatePartySize(value),
+    }));
+  };
 
   // Create booking handler
   async function handleCreateBooking(e) {
@@ -270,18 +370,34 @@ export default function BookingManager() {
           <DatePicker
             label="Visit Date"
             value={visitDate}
-            onChange={(newValue) => setVisitDate(newValue)}
+            //onChange={(newValue) => setVisitDate(newValue)}
+            onChange={handleVisitDateChange}
             renderInput={(params) => (
-              <TextField {...params} required fullWidth margin="normal" />
+              <TextField
+                {...params}
+                required
+                fullWidth
+                margin="normal"
+                error={!!validationErrors.visitDate}
+                helperText={validationErrors.visitDate}
+              />
             )}
           />
 
           <TimePicker
             label="Visit Time"
             value={visitTime}
-            onChange={(newValue) => setVisitTime(newValue)}
+            //onChange={(newValue) => setVisitTime(newValue)}
+            onChange={handleVisitTimeChange}
             renderInput={(params) => (
-              <TextField {...params} required fullWidth margin="normal" />
+              <TextField
+                {...params}
+                required
+                fullWidth
+                margin="normal"
+                error={!!validationErrors.visitTime}
+                helperText={validationErrors.visitTime}
+              />
             )}
           />
 
@@ -309,20 +425,23 @@ export default function BookingManager() {
           <TextField
             label="Your Name"
             value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
+            onChange={handleCustomerNameChange}
             required
             fullWidth
             margin="normal"
+            error={!!validationErrors.customerName}
+            helperText={validationErrors.customerName}
           />
 
           <TextField
             label="Email"
-            type="email"
             value={customerEmail}
-            onChange={(e) => setCustomerEmail(e.target.value)}
+            onChange={handleCustomerEmailChange}
             required
             fullWidth
             margin="normal"
+            error={!!validationErrors.customerEmail}
+            helperText={validationErrors.customerEmail}
           />
 
           <Button
@@ -418,14 +537,15 @@ export default function BookingManager() {
               </Typography>
               <Typography>
                 <strong>Name:</strong>{" "}
-                {bookingDetails.customer.first_name || "—"}{" "}
-                {bookingDetails.customer.surname || ""}
+                {bookingDetails.customer?.first_name || "—"}{" "}
+                {bookingDetails.customer?.surname || ""}
               </Typography>
               <Typography>
-                <strong>Email:</strong> {bookingDetails.customer.email || "—"}
+                <strong>Email:</strong> {bookingDetails.customer?.email || "—"}
               </Typography>
               <Typography>
-                <strong>Mobile:</strong> {bookingDetails.customer.mobile || "—"}
+                <strong>Mobile:</strong>{" "}
+                {bookingDetails.customer?.mobile || "—"}
               </Typography>
             </Box>
 

@@ -14,7 +14,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import availability, booking
 from app.database import engine
 from app.models import Base
+# from app.auth import router as auth_router
 import app.init_db as init_db
+from app import auth
 
 # Create database tables on startup
 Base.metadata.create_all(bind=engine)
@@ -39,6 +41,7 @@ origins = [
 # Include API routers
 app.include_router(availability.router)
 app.include_router(booking.router)
+app.include_router(auth.router)
 # Enable CORS for frontend access
 app.add_middleware(
     CORSMiddleware,
