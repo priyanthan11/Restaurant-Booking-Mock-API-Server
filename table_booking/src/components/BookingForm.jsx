@@ -262,6 +262,12 @@ export default function BookingManager() {
       setBookingReference(data.booking_reference);
       setBookingDetails(data);
 
+      try {
+        const list = JSON.parse(localStorage.getItem("myBookings") || "[]");
+        list.unshift(data); // newest first
+        localStorage.setItem("myBookings", JSON.stringify(list.slice(0, 20)));
+      } catch {}
+
       // prefill modify section
       setUpdateDate(dayjs(data.visit_date));
       setUpdateTime(dayjs(data.visit_time, "HH:mm:ss"));
